@@ -1,6 +1,9 @@
 # mysql_iii_uiux
 資策會 UIUX 班 MySQL 課程
 
+## 課程影片連結
+[MMMH61](https://www.youtube.com/playlist?list=PLV4FeK54eNbzDZLD50LFpkI3AZ4FJ-j8o "MMMH61")
+
 ## 目次
 - 一、XAMPP安裝	1
 - 二、快速導覽	21
