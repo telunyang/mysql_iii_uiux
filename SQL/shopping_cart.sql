@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.1.0
+-- version 5.1.1
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2021-07-20 01:35:20
--- 伺服器版本： 10.4.19-MariaDB
--- PHP 版本： 8.0.6
+-- 產生時間： 2021-07-31 22:00:51
+-- 伺服器版本： 10.4.20-MariaDB
+-- PHP 版本： 8.0.8
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- 資料庫： `shopping_cart`
+-- 資料庫: `shopping_cart`
 --
 CREATE DATABASE IF NOT EXISTS `shopping_cart` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `shopping_cart`;
@@ -779,17 +779,84 @@ INSERT INTO `categories` (`id`, `cat_name`, `parent_id`, `created_at`, `updated_
 -- --------------------------------------------------------
 
 --
+-- 資料表結構 `coupon`
+--
+
+CREATE TABLE `coupon` (
+  `email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'E-mail',
+  `code` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'coupon代碼',
+  `isUsed` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否被使用(0:無;1:有)',
+  `percentage` float NOT NULL DEFAULT 0.95 COMMENT '原價百分比',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp() COMMENT '新增時間',
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT '更新時間'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='優惠券';
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `orders`
+--
+
+CREATE TABLE `orders` (
+  `id` int(11) NOT NULL COMMENT '流水號',
+  `order_id` varchar(13) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '訂單編號',
+  `email` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '使用者 E-mail',
+  `transport_area` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '運送地區',
+  `transport_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '運送方式',
+  `transport_payment` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '付款方式',
+  `transport_arrival_time` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '送達時間',
+  `recipient_email` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '收件者 E-mail',
+  `recipient_name` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '收件者姓名',
+  `recipient_phone_number` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '收件者手機號碼',
+  `recipient_address` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '收件者地址',
+  `recipient_comments` text COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '收件者備註',
+  `invoice_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '發票類型',
+  `invoice_carrier` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '發票載具',
+  `invoice_carrier_number` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '發票載具編號',
+  `coupon_code` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '優惠券代碼',
+  `card_number` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '信用卡號碼',
+  `card_valid_date` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '信用卡到期年限',
+  `card_ccv` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '信用卡CCV',
+  `card_holder` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '信用卡持有人',
+  `total` int(11) DEFAULT NULL COMMENT '總額',
+  `total_m` int(11) DEFAULT NULL COMMENT '優惠後總額',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp() COMMENT '新增時間',
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT '更新時間'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='訂單';
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `orders_detail`
+--
+
+CREATE TABLE `orders_detail` (
+  `order_id` varchar(13) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '訂單編號',
+  `prod_id` int(11) NOT NULL COMMENT '商品編號',
+  `prod_name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '商品名稱',
+  `prod_thumbnail` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '商品縮圖',
+  `prod_price` int(11) DEFAULT NULL COMMENT '商品價格',
+  `prod_color` varchar(15) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '商品顏色',
+  `prod_qty` int(11) DEFAULT NULL COMMENT '商品數量',
+  `prod_subtotal` int(11) DEFAULT NULL COMMENT '商品小計',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp() COMMENT '新增時間',
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT '更新時間'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='商品明細';
+
+-- --------------------------------------------------------
+
+--
 -- 資料表結構 `products`
 --
 
 CREATE TABLE `products` (
   `id` int(11) NOT NULL COMMENT '商品流水號',
-  `prod_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '商品名稱',
-  `prod_thumbnail` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '商品縮圖',
-  `prod_image` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '商品主要圖片',
-  `prod_price` int(11) NOT NULL COMMENT '商品價格',
+  `prod_name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '商品名稱',
+  `prod_thumbnail` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '商品縮圖',
+  `prod_image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '商品主要圖片',
+  `prod_price` int(11) DEFAULT NULL COMMENT '商品價格',
   `prod_description` text COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '商品描述',
-  `cat_id` int(11) NOT NULL COMMENT '類別編號',
+  `cat_id` int(11) DEFAULT NULL COMMENT '類別編號',
   `cat_id_set` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '類別編號集合',
   `created_at` datetime NOT NULL DEFAULT current_timestamp() COMMENT '新增時間',
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT '更新時間'
@@ -7983,6 +8050,19 @@ INSERT INTO `products_colors` (`id`, `color_name`, `prod_id`, `created_at`, `upd
 (5214, '綠色條', 1933, '2021-07-20 01:34:45', '2021-07-20 01:34:45'),
 (5215, '粉紅條', 1933, '2021-07-20 01:34:45', '2021-07-20 01:34:45'),
 (5216, '藏青條', 1933, '2021-07-20 01:34:45', '2021-07-20 01:34:45');
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `products_follow`
+--
+
+CREATE TABLE `products_follow` (
+  `email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '使用者 E-mail',
+  `prod_id` int(11) NOT NULL COMMENT '產品編號',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp() COMMENT '新增時間',
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT '修改時間'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='商品追蹤';
 
 -- --------------------------------------------------------
 
@@ -33033,6 +33113,22 @@ INSERT INTO `products_img` (`id`, `func`, `filename`, `prod_id`, `created_at`, `
 (24966, 'other', 'https://s3.lativ.com.tw/i/CommonPicture/2062/S_TW_1.jpg', 1933, '2021-07-20 01:34:45', '2021-07-20 01:34:45'),
 (24967, 'other', 'https://s4.lativ.com.tw/i/CommonPicture/2031/ITS_TW_G.jpg', 1933, '2021-07-20 01:34:45', '2021-07-20 01:34:45');
 
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `users`
+--
+
+CREATE TABLE `users` (
+  `email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'E-mail',
+  `pwd` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '密碼',
+  `name` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '姓名',
+  `birthdate` date NOT NULL COMMENT '生日',
+  `address` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '地址',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp() COMMENT '新增時間',
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT '更新時間'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='使用者';
+
 --
 -- 已傾印資料表的索引
 --
@@ -33042,6 +33138,25 @@ INSERT INTO `products_img` (`id`, `func`, `filename`, `prod_id`, `created_at`, `
 --
 ALTER TABLE `categories`
   ADD PRIMARY KEY (`id`);
+
+--
+-- 資料表索引 `coupon`
+--
+ALTER TABLE `coupon`
+  ADD PRIMARY KEY (`email`,`code`);
+
+--
+-- 資料表索引 `orders`
+--
+ALTER TABLE `orders`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `order_id` (`order_id`);
+
+--
+-- 資料表索引 `orders_detail`
+--
+ALTER TABLE `orders_detail`
+  ADD PRIMARY KEY (`order_id`,`prod_id`);
 
 --
 -- 資料表索引 `products`
@@ -33056,10 +33171,22 @@ ALTER TABLE `products_colors`
   ADD PRIMARY KEY (`id`);
 
 --
+-- 資料表索引 `products_follow`
+--
+ALTER TABLE `products_follow`
+  ADD PRIMARY KEY (`email`,`prod_id`);
+
+--
 -- 資料表索引 `products_img`
 --
 ALTER TABLE `products_img`
   ADD PRIMARY KEY (`id`);
+
+--
+-- 資料表索引 `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`email`);
 
 --
 -- 在傾印的資料表使用自動遞增(AUTO_INCREMENT)
@@ -33070,6 +33197,12 @@ ALTER TABLE `products_img`
 --
 ALTER TABLE `categories`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '流水號', AUTO_INCREMENT=734;
+
+--
+-- 使用資料表自動遞增(AUTO_INCREMENT) `orders`
+--
+ALTER TABLE `orders`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '流水號';
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `products`
